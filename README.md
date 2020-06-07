@@ -1,10 +1,15 @@
 # Bon Do
 Охает, ахает, ухает, не любит украинский в опросах
+
 Ругает за баяны (персистентно)
 
-Живет [здесь](https://t.me/bon_do_bot)
+Говорит когда шаббат
 
 Использует [форк](https://github.com/graynk/JImageHash/tree/database-chat) библиотеки [JImageHash](https://github.com/KilianB/JImageHash)
+
+## Использование
+
+Живет [здесь](https://t.me/bon_do_bot)
 
 Можно запустить в докере:
 ```
