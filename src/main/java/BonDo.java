@@ -8,6 +8,7 @@ import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.GetFile;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SendSticker;
+import com.pengrad.telegrambot.request.SendVideoNote;
 import com.pengrad.telegrambot.request.SendVoice;
 import model.Shabbat;
 import model.Util;
@@ -19,8 +20,6 @@ import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.sql.SQLException;
 import java.time.DayOfWeek;
 import java.time.ZoneId;
@@ -35,23 +34,25 @@ public class BonDo implements UpdatesListener {
     private final TelegramBot bot;
     private final ObjectMapper mapper;
     private final H2DatabaseImageMatcher imageMatcher;
-    private final Pattern ohPattern = Pattern.compile(
+    final static Pattern ohPattern = Pattern.compile(
             "(\\b[oо]+|\\b[аa]+|\\b[ы]+|\\b[еe]+|\\b[уy]+|\\b[э]+)[xх]+\\b",
             Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE
     );
-    private final Pattern foolPattern = Pattern.compile(
+    final static Pattern baguettePattern = Pattern.compile(
+            "(\\b((хо){3,4}|багет[ь]?)\\b)",
+            Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE
+    );
+    final static Pattern foolPattern = Pattern.compile(
             "(\\b[ё]+|\\b[ю]+|\\b[я]+)[xх]+\\b",
             Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE
     );
     private final URI shabbatURI = URI.create("https://www.hebcal.com/shabbat/?cfg=json&geo=Jerusalem&geonameid=281184");
-    private final byte[] nesmeshno;
     private final ZoneId jerusalem = ZoneId.of("Asia/Jerusalem");
 
     public BonDo(String token, ObjectMapper mapper, H2DatabaseImageMatcher imageMatcher) throws IOException {
         this.bot = new TelegramBot(token);
         this.mapper = mapper;
         this.imageMatcher = imageMatcher;
-        this.nesmeshno = Files.readAllBytes(Path.of("nesmeshno.ogg"));
     }
 
     public void start() {
@@ -73,7 +74,10 @@ public class BonDo implements UpdatesListener {
                 if (!handled)
                     handled = handleShabbat(chatId, text);
                 if (!handled)
-                    handleShabaka(chatId, text);
+                    handled = handleShabaka(chatId, text);
+                if (!handled) {
+                    handleBaguette(chatId, text);
+                }
             } else if (message.photo() != null && message.photo().length > 0 && message.chat().type() == Chat.Type.supergroup) {
                 var link = Util.generateMessageLink(message);
                 handlePhoto(chatId, message.messageId(), link, message.photo());
@@ -123,12 +127,13 @@ public class BonDo implements UpdatesListener {
         return true;
     }
 
-    private void handleShabaka(Long chatId, String text) {
+    private boolean handleShabaka(Long chatId, String text) {
         if (!text.toLowerCase().contains("когда шабака")) {
-            return;
+            return false;
         }
         // гау гау
         bot.execute(new SendSticker(chatId, "CAACAgIAAx0CRIwq1wACB_1e3MxXXPUDini1VgABFkMm1eMtl_MAAlYAA0lgaApie_5XONzdohoE"));
+        return true;
     }
 
     private void handleUkranianPolls(Long chatId, Chat forwardFrom) {
@@ -138,7 +143,14 @@ public class BonDo implements UpdatesListener {
         if (forwardFrom.id() != -1001404061676L) {
             return;
         }
-        bot.execute(new SendVoice(chatId, nesmeshno));
+        bot.execute(new SendVoice(chatId, "AwACAgIAAx0CRIwq1wACCF9e56cGg6_B4h9zUsNyfpKRg34s4gACOQcAAh4VOEs435hLXOjWFRoE"));
+    }
+
+    private void handleBaguette(Long chatId, String text) {
+        var matcher = baguettePattern.matcher(text);
+        if (matcher.find()) {
+            bot.execute(new SendVideoNote(chatId, "DQACAgIAAx0CRIwq1wACCFZe56arCYZRPfOAOHvgi243TH4URAACOAcAAh4VOEvw1eDWrZFm-BoE"));
+        }
     }
 
     private void handlePhoto(Long chatId, Integer replyId, String link, PhotoSize[] photoSizes) {

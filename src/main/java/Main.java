@@ -14,7 +14,7 @@ public class Main {
                 .addModule(new JavaTimeModule())
                 .build();
         var db = new H2DatabaseImageMatcher("db/imageHashDB", "user", "");
-        db.addHashingAlgorithm(new PerceptiveHash(32), .04);
+        db.addHashingAlgorithm(new PerceptiveHash(32), .02);
 
         var token = System.getenv("BOT_TOKEN");
         var bondo = new BonDo(token, mapper, db);
