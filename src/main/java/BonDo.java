@@ -116,6 +116,7 @@ public class BonDo implements UpdatesListener {
                 var client = HttpClient.newHttpClient();
                 var response = client.send(request, HttpResponse.BodyHandlers.ofString());
                 shabbat = mapper.readValue(response.body(), Shabbat.class);
+                shabbat.setDate(now);
             } else {
                 var nextFriday = now.with(TemporalAdjusters.next(DayOfWeek.FRIDAY));
                 shabbat = new Shabbat(now, nextFriday, nextFriday.plusDays(1));
