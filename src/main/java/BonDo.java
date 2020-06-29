@@ -108,7 +108,7 @@ public class BonDo implements UpdatesListener {
         try {
             var now = ZonedDateTime.now(jerusalem);
             Shabbat shabbat;
-            if (now.getDayOfWeek() == DayOfWeek.FRIDAY) {
+            if (now.getDayOfWeek() == DayOfWeek.FRIDAY || now.getDayOfWeek() == DayOfWeek.SATURDAY) {
                 var request = HttpRequest.newBuilder(shabbatURI)
                         .header("Accept", "application/json")
                         .GET()
