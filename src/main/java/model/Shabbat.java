@@ -1,13 +1,10 @@
 package model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
-@JsonIgnoreProperties(value = { "link", "title", "location" })
 public class Shabbat {
     private ZonedDateTime shabbatDate;
     private ZonedDateTime havdalahDate;
