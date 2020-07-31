@@ -20,6 +20,8 @@ import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.SQLException;
 import java.time.DayOfWeek;
 import java.time.ZoneId;
@@ -34,6 +36,10 @@ public class BonDo implements UpdatesListener {
     private final TelegramBot bot;
     private final ObjectMapper mapper;
     private final H2DatabaseImageMatcher imageMatcher;
+    private final byte[] nesmeshno;
+    private final byte[] baguette;
+    private volatile String nesmeshnoId = "AwACAgIAAx0CRIwq1wACCF9e56cGg6_B4h9zUsNyfpKRg34s4gACOQcAAh4VOEs435hLXOjWFRoE";
+    private volatile String baguetteId = "DQACAgIAAx0CRIwq1wACCFZe56arCYZRPfOAOHvgi243TH4URAACOAcAAh4VOEvw1eDWrZFm-BoE";
     final static Pattern ohPattern = Pattern.compile(
             "(\\b[oо]+|\\b[аa]+|\\b[ы]+|\\b[еe]+|\\b[уy]+|\\b[э]+)[xх]+\\b",
             Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE
@@ -53,6 +59,8 @@ public class BonDo implements UpdatesListener {
         this.bot = new TelegramBot(token);
         this.mapper = mapper;
         this.imageMatcher = imageMatcher;
+        this.nesmeshno = Files.readAllBytes(Path.of("nesmeshno.ogg"));
+        this.baguette = Files.readAllBytes(Path.of("baguette.mp4"));
     }
 
     public void start() {
@@ -144,13 +152,22 @@ public class BonDo implements UpdatesListener {
         if (forwardFrom.id() != -1001404061676L) {
             return;
         }
-        bot.execute(new SendVoice(chatId, "AwACAgIAAx0CRIwq1wACCF9e56cGg6_B4h9zUsNyfpKRg34s4gACOQcAAh4VOEs435hLXOjWFRoE"));
+
+        var answer = bot.execute(new SendVoice(chatId, nesmeshnoId));
+        if (!answer.isOk()) {
+            answer = bot.execute(new SendVoice(chatId, nesmeshno));
+            nesmeshnoId = answer.message().voice().fileId();
+        }
     }
 
     private void handleBaguette(Long chatId, String text) {
         var matcher = baguettePattern.matcher(text);
         if (matcher.find()) {
-            bot.execute(new SendVideoNote(chatId, "DQACAgIAAx0CRIwq1wACCFZe56arCYZRPfOAOHvgi243TH4URAACOAcAAh4VOEvw1eDWrZFm-BoE"));
+            var answer = bot.execute(new SendVideoNote(chatId, baguetteId));
+            if (!answer.isOk()) {
+                answer = bot.execute(new SendVideoNote(chatId, baguette));
+                baguetteId = answer.message().videoNote().fileId();
+            }
         }
     }
 
