@@ -23,8 +23,15 @@ public class Shabbat {
     }
 
     public void setItems(List<Item> items) {
-        shabbatDate = items.get(0).getDate();
-        havdalahDate = items.get(2).getDate();
+        for (var item : items) {
+            var category = item.getCategory();
+            if (category == null) continue;;
+            if (category.equals("candles")) {
+                shabbatDate = item.getDate();
+            } else if (category.equals("havdalah")) {
+                havdalahDate = item.getDate();
+            }
+        }
     }
 
     public String calculateTime() {
