@@ -25,10 +25,10 @@ public class Shabbat {
     public void setItems(List<Item> items) {
         for (var item : items) {
             var category = item.getCategory();
-            if (category == null) continue;;
-            if (category.equals("candles")) {
+            if (category == null) continue;
+            if (category.equals("candles") && shabbatDate == null) {
                 shabbatDate = item.getDate();
-            } else if (category.equals("havdalah")) {
+            } else if (category.equals("havdalah") && havdalahDate == null) {
                 havdalahDate = item.getDate();
             }
         }
