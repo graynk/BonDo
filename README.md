@@ -1,23 +1,17 @@
 # Bon Do
-Охает, ахает, ухает, не любит украинский в опросах
-
-Ругает за баяны (персистентно)
+Охает, ахает, ухает, снова любит украинский в опросах
 
 Говорит когда шаббат
-
-Использует [форк](https://github.com/graynk/JImageHash/tree/database-chat) библиотеки [JImageHash](https://github.com/KilianB/JImageHash)
 
 ## Использование
 
 Живет [здесь](https://t.me/bon_do_bot)
 
-Можно запустить в докере:
+## Сборка
+Поставить Nim 1.4
+
 ```
-export BOT_TOKEN=ваш_токен
-docker run -d \
-    --restart unless-stopped \
-    --name bondo \
-    -e BOT_TOKEN \
-    --mount type=bind,source=./db,target=/root/db \
-    graynk/bondo
+nimble install telebot regex timezones
+nim compile -d:ssl --opt:size -d:release bondo.nim
 ```
+Проставить токен в переменную среды `BONDO_TOKEN`, ну и положить багет рядом с бинарником
