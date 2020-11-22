@@ -1,17 +1,18 @@
 # Bon Do
-Охает, ахает, ухает, снова любит украинский в опросах
-
-Говорит когда шаббат
+Охает, ахает, ухает, говорит когда шаббат и когда шабака
 
 ## Использование
 
 Живет [здесь](https://t.me/bon_do_bot)
 
 ## Сборка
-Поставить Nim 1.4
+Можно запустить в докере:
 
 ```
-nimble install telebot regex timezones
-nim compile -d:ssl --opt:size -d:release bondo.nim
+export BOT_TOKEN=ваш_токен
+docker run -d \
+    --restart unless-stopped \
+    --name bondo \
+    -e BOT_TOKEN \
+    graynk/bondo
 ```
-Проставить токен в переменную среды `BONDO_TOKEN`, ну и положить багет рядом с бинарником
