@@ -38,7 +38,7 @@ shabaka_default_sticker = 'CAACAgIAAx0CRIwq1wACB_1e3MxXXPUDini1VgABFkMm1eMtl_MAA
 big_font = ImageFont.truetype('times-new-roman.ttf', 36)
 smol_font = ImageFont.truetype('times-new-roman.ttf', 26)
 
-oh_pattern = re.compile(r'(\b[oо]+|\b[аa]+|\b[ы]+|\b[и]+|\b[еe]+|\b[уy]+|\b[э]+)[xх]+\b', flags=re.IGNORECASE)
+oh_pattern = re.compile(r'(\b[oо]+|\b[аa]+|\b[ы]+|\b[еe]+|\b[уy]+|\b[э]+)[xх]+\b', flags=re.IGNORECASE)
 fool_pattern = re.compile(r'(\b[ё]+|\b[ю]+|\b[я]+)[xх]+\b', flags=re.IGNORECASE)
 sabbath_pattern = re.compile(r'\b(шаббат\W+(?:\w+\W+)??когда|когда\W+(?:\w+\W+)??шаббат)', flags=re.IGNORECASE)
 baguette_pattern = re.compile(r'(\b((хо){3,4}|багет((ь)?|(а)?|(ом)?|(ов)?|(ы)?))\b)', flags=re.IGNORECASE)
