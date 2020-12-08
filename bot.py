@@ -165,7 +165,7 @@ def calculate_shabbat() -> str:
 
 
 def calculate_oh(match: Optional[Match[AnyStr]]) -> str:
-    return random.randint(1, 8) * match.group(1).lower() + random.randint(1, 8) * 'х' + random.randint(0, 3) * '.'
+    return random.randint(1, 8) * match.group(1).lower()[0] + random.randint(1, 8) * 'х' + random.randint(0, 3) * '.'
 
 
 def add_text(image: Image, text: str, position: tuple, font: ImageFont=big_font) -> Image:
