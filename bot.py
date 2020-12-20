@@ -145,15 +145,15 @@ def calculate_shabbat() -> str:
                 result += '{} секунд'.format(seconds)
             # русский говно
             last_digit = ending % 10
-            if last_digit == 1 and ending != 11:
+            if ending != 11 and last_digit == 1:
                 result += 'у'
-            elif 2 <= last_digit < 5:
+            elif (ending < 12 or ending >= 22) and 2 <= last_digit < 5:
                 result += 'ы'
             return result
         else:
             return EBAT_SHABBAT
     elif days_left == -1:
-        shabbat_end = sun(city.observer, date=now + datetime.timedelta(days=1), tzinfo=city.timezone)['sunset']
+        shabbat_end = sun(city.observer, date=now, tzinfo=city.timezone)['sunset']
         if shabbat_end > now:
             return EBAT_SHABBAT
         else:
