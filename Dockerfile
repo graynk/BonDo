@@ -6,6 +6,10 @@ RUN apt-get update && apt-get install -y espeak ffmpeg
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
+COPY test_format_timedelta.py .
+COPY format_timedelta.py .
+RUN python3 -m unittest test_format_timedelta.py
+
 COPY bot.py .
 COPY shabaka.webp .
 COPY baguette.mp4 .
