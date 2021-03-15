@@ -9,9 +9,8 @@ from telegram.ext import Updater
 from telegram.ext import CommandHandler
 from telegram.ext import MessageHandler
 from telegram.ext import Filters
-from astral import LocationInfo
-from astral.sun import sun
 from io import BytesIO
+from format_timedelta import calculate_shabbat
 import pyttsx3
 import pytz
 import random
@@ -24,19 +23,21 @@ import os
 import time
 
 TOKEN = os.environ.get('BOT_TOKEN')
-EBAT_SHABBAT = 'ебать, шаббат'
-FUCK_SHABBAT_IS_OVER = 'бля шаббат кончился'
 WHADDAYA_STOOPED = 'ну ты дурак штоле?'
-
-tz = pytz.timezone('Asia/Jerusalem')
-city = LocationInfo('Jerusalem', 'Israel', tz.zone, 31.47, 35.13)
 updater = Updater(TOKEN, use_context=True)
 dispatcher = updater.dispatcher
+tz = pytz.timezone('Asia/Jerusalem')
 
 shabaka = Image.open('./shabaka.webp')
 shabaka_default_sticker = 'CAACAgIAAx0CRIwq1wACB_1e3MxXXPUDini1VgABFkMm1eMtl_MAAlYAA0lgaApie_5XONzdohoE'
-big_font = ImageFont.truetype('times-new-roman.ttf', 36)
-smol_font = ImageFont.truetype('times-new-roman.ttf', 26)
+
+shabaka_head_height = 90
+shabaka_top_middle = 235
+shabaka_top_width = 424
+shabaka_bot_middle = 310
+shabaka_bot_width = 277
+default_font_size = 36
+big_font = ImageFont.truetype('times-new-roman.ttf', default_font_size)
 
 oh_pattern = re.compile(r'(\b[oо]+|\b[аa]+|\b[ы]+|\b[еe]+|\b[уy]+|\b[э]+)[xх]+\b', flags=re.IGNORECASE)
 fool_pattern = re.compile(r'(\b[ё]+|\b[ю]+|\b[я]+)[xх]+\b', flags=re.IGNORECASE)
@@ -65,7 +66,7 @@ def fuck_wut(update: Update, context: CallbackContext):
         oh = calculate_oh(oh_match)
     sabbath_match = sabbath_pattern.search(text)
     if sabbath_match:
-        sabbath = calculate_shabbat()
+        sabbath = calculate_shabbat(datetime.datetime.now(tz))
     baguette_match = baguette_pattern.search(text)
     has_shabaka = 'шабака' in text.lower()
 
@@ -74,11 +75,11 @@ def fuck_wut(update: Update, context: CallbackContext):
         image.paste(shabaka, (0, 0))
         has_text = oh_match or sabbath_match or baguette_match
         if oh_match:
-            image = add_text(image, oh, (25, 25))
+            image = add_text(image, oh.strip('.'), 25)
         if sabbath_match:
-            image = add_text(image, sabbath, (70, 60), smol_font)
+            image = add_text(image, sabbath, 60)
         if baguette_match:
-            image = add_text(image, baguette_match.group(1), (300, 90))
+            image = add_text(image, baguette_match.group(1), 95)
         sticker = get_image_bytes(image) if has_text else shabaka_default_sticker
         bot.send_sticker(chat_id, sticker)
     elif baguette_match:
@@ -88,7 +89,7 @@ def fuck_wut(update: Update, context: CallbackContext):
 
         has_voice = oh_match or sabbath_match
         if has_voice:
-            engine = pyttsx3.init() # по-другому оно не работает и виснет после длинных фраз на runAndWait()
+            engine = pyttsx3.init()  # по-другому оно не работает и виснет после длинных фраз на runAndWait()
             engine.setProperty('voice', 'russian')
         if oh_match:
             oh_voice = str(uuid.uuid4()) + '.mp3'
@@ -117,60 +118,31 @@ def fuck_wut(update: Update, context: CallbackContext):
         bot.send_message(chat_id, sabbath)
 
 
-def calculate_shabbat() -> str:
-    now = datetime.datetime.now(tz)
-    days_left = 4 - now.weekday()
-    if days_left == 0:
-        shabbat_start = sun(city.observer, date=now, tzinfo=city.timezone)['sunset']
-        if shabbat_start > now:
-            till_shabbat = shabbat_start - now
-            # таймдельта говно
-            hours, minutes, seconds = till_shabbat.seconds // 3600, (
-                    till_shabbat.seconds // 60) % 60, till_shabbat.seconds
-            ending = minutes
-            result = 'через '
-            if hours != 0:
-                hour_string = 'час'
-                if 2 <= hours < 5 or 22 <= hours < 25:
-                    hour_string += 'а'
-                elif 5 <= hours < 21:
-                    hour_string += 'ов'
-                result += '{} {} '.format(hours, hour_string)
-            if minutes != 0:
-                result += '{} минут'.format(minutes)
-            if hours == 0 and minutes == 0:
-                if seconds == 0:
-                    return EBAT_SHABBAT
-                ending = seconds
-                result += '{} секунд'.format(seconds)
-            # русский говно
-            last_digit = ending % 10
-            if ending != 11 and last_digit == 1:
-                result += 'у'
-            elif (ending < 12 or ending >= 22) and 2 <= last_digit < 5:
-                result += 'ы'
-            return result
-        else:
-            return EBAT_SHABBAT
-    elif days_left == -1:
-        shabbat_end = sun(city.observer, date=now, tzinfo=city.timezone)['sunset']
-        if shabbat_end > now:
-            return EBAT_SHABBAT
-        else:
-            return FUCK_SHABBAT_IS_OVER
-    elif days_left == -2:
-        return (6 + days_left) * 'после' + 'завтра'
-    else:
-        return (days_left - 1) * 'после' + 'завтра'
-
-
 def calculate_oh(match: Optional[Match[AnyStr]]) -> str:
     return random.randint(1, 8) * match.group(1).lower()[0] + random.randint(1, 8) * 'х' + random.randint(0, 3) * '.'
 
 
-def add_text(image: Image, text: str, position: tuple, font: ImageFont=big_font) -> Image:
+def add_text(image: Image, text: str, height: int) -> Image:
     draw = ImageDraw.Draw(image)
-    draw.text(position, text, (255, 255, 255), font=font, align='center')
+    font = big_font
+    size = draw.textsize(text, font)
+    font_size = default_font_size
+    if height < shabaka_head_height:
+        middle = shabaka_top_middle
+        box_width = shabaka_top_width
+    else:
+        middle = shabaka_bot_middle
+        box_width = shabaka_bot_width
+
+    while size[0] > box_width and font_size > 1:
+        font_size -= 5
+        if font_size < 1:
+            font_size = 1
+        font = ImageFont.truetype('times-new-roman.ttf', font_size)
+        size = draw.textsize(text, font)
+    width = middle - size[0] / 2
+
+    draw.text((width, height), text, (255, 255, 255), font=font, align='center')
     return image
 
 
@@ -236,5 +208,5 @@ if __name__ == '__main__':
     wut_handler = MessageHandler(Filters.text, fuck_wut)
     dispatcher.add_handler(start_handler)
     dispatcher.add_handler(wut_handler)
-    updater.start_polling()
+    updater.start_polling(drop_pending_updates=True)
     updater.idle()
