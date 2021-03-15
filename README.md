@@ -14,5 +14,5 @@ docker run -d \
     --restart unless-stopped \
     --name bondo \
     -e BOT_TOKEN \
-    ghct.io/graynk/bondobot
+    ghcr.io/graynk/bondobot
 ```
