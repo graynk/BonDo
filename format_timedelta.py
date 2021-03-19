@@ -25,8 +25,9 @@ def calculate_shabbat(now: datetime) -> str:
     next_friday = now + timedelta(days=days_left)
     shabbat_start = sun(city.observer, date=next_friday, tzinfo=city.timezone)['sunset']
     td = shabbat_start - now
-    if td.days == 0 and td.seconds == 0:
+    if shabbat_start < now or td.days == 0 and td.seconds == 0:
         return EBAT_SHABBAT
+
     return format_timedelta(td)
 
 

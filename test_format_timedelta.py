@@ -63,6 +63,8 @@ class FormatTimedeltaCase(unittest.TestCase):
         self.assertEqual('через 1 день', calculate_shabbat(now))
         now = datetime(year=2021, month=3, day=19, hour=18, minute=11, second=4, tzinfo=tz)
         self.assertEqual('ебать, шаббат', calculate_shabbat(now))
+        now = datetime(year=2021, month=3, day=19, hour=21, minute=18, second=4, tzinfo=tz)
+        self.assertEqual('ебать, шаббат', calculate_shabbat(now))
         now = datetime(year=2021, month=3, day=19, hour=17, minute=11, second=4, tzinfo=tz)
         self.assertEqual('через 1 час', calculate_shabbat(now))
         now = datetime(year=2021, month=3, day=19, hour=17, minute=10, second=0, tzinfo=tz)
