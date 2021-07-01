@@ -59,7 +59,7 @@ def fuck_wut(update: Update, context: CallbackContext):
 
     fool_match = fool_pattern.search(text)
     if fool_match:
-        update.effective_message.reply_text(chat_id, WHADDAYA_STOOPED, quote=True)
+        update.effective_message.reply_text(WHADDAYA_STOOPED, quote=True)
 
     oh_match = oh_pattern.search(text)
     if oh_match:
