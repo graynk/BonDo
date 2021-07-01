@@ -205,7 +205,7 @@ if __name__ == '__main__':
     if not features.check_module('webp'):
         sys.exit('no webp support')
     start_handler = CommandHandler(str('start'), start)
-    wut_handler = MessageHandler(Filters.text, fuck_wut)
+    wut_handler = MessageHandler(Filters.text & ~Filters.update, fuck_wut)
     dispatcher.add_handler(start_handler)
     dispatcher.add_handler(wut_handler)
     updater.start_polling(drop_pending_updates=True)
