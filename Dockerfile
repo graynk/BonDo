@@ -16,4 +16,4 @@ COPY baguette.mp4 .
 COPY times-new-roman.ttf .
 COPY ru_dict /usr/lib/x86_64-linux-gnu/espeak-data/
 
-CMD [ "python", "./bot.py" ]
+ENTRYPOINT [ "python", "./bot.py" ]
