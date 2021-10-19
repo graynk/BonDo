@@ -82,7 +82,7 @@ def huge_and_ugly_mega_text_handler_whaddaya_gonna_do_about_huh_its_my_bot(updat
     elif update.effective_chat.type == CHAT_PRIVATE or \
             (
                     (update.effective_chat.type == CHAT_SUPERGROUP or update.effective_chat.type == CHAT_GROUP) and
-                    (fool_match or bot_was_mentioned or from_user == bot.get_me() or random.random() < 0.01)
+                    (fool_match or bot_was_mentioned or (from_user == bot.get_me() and random.random() < 0.1) or random.random() < 0.01)
             ):
         neural_text = neuro_response(last_messages)
         message.reply_text(neural_text, quote=True)
