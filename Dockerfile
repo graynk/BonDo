@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install -y espeak ffmpeg
 RUN curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain stable -y
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
+RUN rustup self uninstall -y
 
 COPY test_format_timedelta.py .
 COPY format_timedelta.py .
