@@ -63,7 +63,7 @@ def neuro_response(last_messages: List[str]) -> str:
     model = GPT2LMHeadModel.from_pretrained('models/')
     model.cpu()
     inpt = tok.encode(prompt, return_tensors='pt')
-    out = model.generate(inpt.cpu(), max_length=150, repetition_penalty=5.0, do_sample=True, top_k=5, top_p=0.95,
+    out = model.generate(inpt.cpu(), max_length=100, repetition_penalty=5.0, do_sample=True, top_k=5, top_p=0.95,
                          temperature=0.8)
     generated = tok.decode(out[0])
     print(generated)  # sorta debug
