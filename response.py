@@ -5,10 +5,10 @@ from typing import List
 
 import pyttsx3
 from PIL import Image
-from transformers import GPT2LMHeadModel, GPT2Tokenizer
 
 from draw import shabaka, add_text, get_image_bytes, shabaka_default_sticker
 from ffmpeg import run_ffmpeg
+from neural import tok, model, generate_and_clean
 
 
 def shabaka_response(oh_match, sabbath_match, baguette_match, oh, sabbath):
@@ -59,28 +59,4 @@ def oh_response(sabbath_match, oh, sabbath) -> str:
 
 def neuro_response(last_messages: List[str]) -> str:
     prompt = '\n'.join(last_messages) + '\n'
-    tok = GPT2Tokenizer.from_pretrained('models/')
-    model = GPT2LMHeadModel.from_pretrained('models/')
-    model.cpu()
-    inpt = tok.encode(prompt, return_tensors='pt')
-    out = model.generate(inpt.cpu(), max_length=100, repetition_penalty=5.0, do_sample=True, top_k=5, top_p=0.95,
-                         temperature=0.8)
-    generated = tok.decode(out[0])
-    print(generated)  # sorta debug
-    cleaned = generated[len(prompt):]
-    happy = cleaned.find('))')
-    sad = cleaned.find('((')
-    if happy != -1 and sad != -1:
-        smiley_index = min(happy, sad)
-    else:
-        smiley_index = max(happy, sad)
-    if smiley_index != -1:
-        if len(cleaned) - smiley_index > 5:
-            smiley_index += 3
-        cleaned = cleaned[:smiley_index]
-    single_quote = cleaned.count('"')
-    if single_quote % 2 != 0:
-        single_quote_index = cleaned.rfind('"')
-        if single_quote_index > 0:
-            cleaned = cleaned[:single_quote_index]
-    return cleaned
+    return generate_and_clean(prompt)

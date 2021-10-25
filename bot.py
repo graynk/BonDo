@@ -48,7 +48,9 @@ def huge_and_ugly_mega_text_handler_whaddaya_gonna_do_about_huh_its_my_bot(updat
     last_messages = context.chat_data[LAST_MESSAGES]
     cleaned_from_username = text.replace(bot_username, '')
     bot_was_mentioned = len(text) != len(cleaned_from_username)
-    last_messages.append(cleaned_from_username.strip())
+    cleaned_from_username = cleaned_from_username.strip()
+    if cleaned_from_username != '':
+        last_messages.append(cleaned_from_username)
 
     sabbath = None
     oh = None
@@ -82,9 +84,13 @@ def huge_and_ugly_mega_text_handler_whaddaya_gonna_do_about_huh_its_my_bot(updat
     elif update.effective_chat.type == CHAT_PRIVATE or \
             (
                     (update.effective_chat.type == CHAT_SUPERGROUP or update.effective_chat.type == CHAT_GROUP) and
-                    (fool_match or bot_was_mentioned or (from_user == bot.get_me() and random.random() < 0.1) or random.random() < 0.01)
+                    (
+                            fool_match or bot_was_mentioned or
+                            (from_user == bot.get_me() and (random.random() < 0.1 or '?' in text)) or
+                            random.random() < 0.01)
             ):
         neural_text = neuro_response(last_messages)
+        last_messages.append(neural_text)
         message.reply_text(neural_text, quote=True)
 
 

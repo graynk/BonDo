@@ -17,9 +17,10 @@ COPY bot.py .
 COPY draw.py .
 COPY ffmpeg.py .
 COPY response.py .
+COPY neural.py .
 COPY shabaka.webp .
 COPY baguette.mp4 .
 COPY times-new-roman.ttf .
 COPY ru_dict /usr/lib/x86_64-linux-gnu/espeak-data/
 
-ENTRYPOINT [ "python", "bot.py" ]
+ENTRYPOINT [ "python", "-u", "bot.py" ]
