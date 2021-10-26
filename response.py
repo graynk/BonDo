@@ -60,3 +60,7 @@ def oh_response(sabbath_match, oh, sabbath) -> str:
 def neuro_response(last_messages: List[str]) -> str:
     prompt = '\n'.join(last_messages) + '\n'
     return generate_and_clean(prompt)
+
+
+def neuro_complete(prompt: str) -> str:
+    return generate_and_clean(prompt)

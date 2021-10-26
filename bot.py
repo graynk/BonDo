@@ -19,7 +19,7 @@ from telegram.ext import MessageHandler
 from telegram.ext import Updater
 
 from format_timedelta import calculate_shabbat
-from response import shabaka_response, baguette_response, oh_response, neuro_response
+from response import shabaka_response, baguette_response, oh_response, neuro_response, neuro_complete
 
 TOKEN = os.environ.get('BOT_TOKEN')
 LAST_MESSAGES = 'last_messages'
@@ -89,7 +89,10 @@ def huge_and_ugly_mega_text_handler_whaddaya_gonna_do_about_huh_its_my_bot(updat
                             (from_user == bot.get_me() and (random.random() < 0.1 or '?' in text)) or
                             random.random() < 0.01)
             ):
-        neural_text = neuro_response(last_messages)
+        if 'допиши' in text.lower() and message.reply_to_message and message.reply_to_message.text:
+            neural_text = neuro_complete(message.reply_to_message.text)
+        else:
+            neural_text = neuro_response(last_messages)
         last_messages.append(neural_text)
         message.reply_text(neural_text, quote=True)
 
