@@ -5,4 +5,4 @@ pyttsx3==2.90
 pytz~=2021.3
 torch==1.9.0
 transformers==4.11.3
-numpy==1.21.2
+numpy==1.22.0
