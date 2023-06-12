@@ -4,5 +4,5 @@ astral==2.2
 pyttsx3==2.90
 pytz~=2021.3
 torch==1.9.0
-transformers==4.11.3
+transformers==4.30.0
 numpy==1.21.2
