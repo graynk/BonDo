@@ -8,7 +8,7 @@ from PIL import Image
 
 from draw import shabaka, add_text, get_image_bytes, shabaka_default_sticker
 from ffmpeg import run_ffmpeg
-from neural import tok, model, generate_and_clean
+from neural import generate_and_clean
 
 
 def shabaka_response(oh_match, sabbath_match, baguette_match, oh, sabbath):
