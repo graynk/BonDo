@@ -11,7 +11,7 @@ shabaka_top_width = 424
 shabaka_bot_middle = 310
 shabaka_bot_width = 277
 default_font_size = 36
-big_font = ImageFont.truetype('times-new-roman.ttf', default_font_size)
+big_font = ImageFont.truetype('font.ttf', default_font_size)
 
 
 def add_text(image: Image, text: str, height: int) -> Image:
@@ -30,7 +30,7 @@ def add_text(image: Image, text: str, height: int) -> Image:
         font_size -= 5
         if font_size < 1:
             font_size = 1
-        font = ImageFont.truetype('times-new-roman.ttf', font_size)
+        font = ImageFont.truetype('font.ttf', font_size)
         size = draw.textbbox((0, 0), text, font)
     width = middle - size[2] / 2
 
