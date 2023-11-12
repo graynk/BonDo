@@ -3,6 +3,8 @@ from transformers import GPT2LMHeadModel, GPT2Tokenizer
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 tok = GPT2Tokenizer.from_pretrained('models/')
+if tok.pad_token is None:
+    tok.pad_token = tok.eos_token
 model = GPT2LMHeadModel.from_pretrained('models/')
 model.to(device)
 MAX_LENGTH = 150
@@ -29,10 +31,14 @@ def clean(generated: str) -> str:
 
 def generate_and_clean(prompt: str) -> str:
     inpt = tok.encode(prompt, return_tensors='pt')
-    out = model.generate(inpt.to(device), max_length=MAX_LENGTH + (len(prompt) / 3), repetition_penalty=5.0, do_sample=True,
+    out = model.generate(inpt.to(device),
+                         max_length=MAX_LENGTH + (len(prompt) / 3),
+                         repetition_penalty=5.0,
+                         do_sample=True,
                          top_k=5,
                          top_p=0.95,
-                         temperature=0.8)
+                         temperature=0.8,
+                         pad_token_id=tok.pad_token_id)
     generated = tok.decode(out[0])
     print(generated)  # sorta debug
     generated = generated[len(prompt):]

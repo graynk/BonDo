@@ -11,20 +11,16 @@ from typing import Optional, AnyStr, Match
 import pytz
 from PIL import features
 from telegram import Update
-from telegram.constants import CHAT_SUPERGROUP, CHAT_GROUP, CHAT_PRIVATE
-from telegram.ext import CallbackContext
-from telegram.ext import CommandHandler
-from telegram.ext import Filters
-from telegram.ext import MessageHandler
-from telegram.ext import Updater
+from telegram.constants import ChatType
+from telegram.ext import Application, CallbackContext, CommandHandler, MessageHandler
+from telegram.ext import filters
 
 from format_timedelta import calculate_shabbat
 from response import shabaka_response, baguette_response, oh_response, neuro_response, neuro_complete
 
 TOKEN = os.environ.get('BOT_TOKEN')
 LAST_MESSAGES = 'last_messages'
-updater = Updater(TOKEN, use_context=True)
-dispatcher = updater.dispatcher
+application = Application.builder().token(TOKEN).build()
 tz = pytz.timezone('Asia/Jerusalem')
 
 oh_pattern = re.compile(r'(\b[oо]+|\b[аa]+|\b[ы]+|\b[еe]+|\b[уy]+|\b[э]+)[xх]+\b', flags=re.IGNORECASE)
@@ -37,7 +33,7 @@ def start(update: Update, context: CallbackContext):
     context.bot.send_message(chat_id=update.effective_chat.id, text='оохххх...')
 
 
-def huge_and_ugly_mega_text_handler_whaddaya_gonna_do_about_huh_its_my_bot(update: Update, context: CallbackContext):
+async def huge_and_ugly_mega_text_handler_whaddaya_gonna_do_about_huh_its_my_bot(update: Update, context: CallbackContext):
     bot = context.bot
     bot_username = '@{}'.format(bot.username)
     message = update.effective_message
@@ -68,22 +64,22 @@ def huge_and_ugly_mega_text_handler_whaddaya_gonna_do_about_huh_its_my_bot(updat
 
     if has_shabaka:
         sticker = shabaka_response(oh_match, sabbath_match, baguette_match, oh, sabbath)
-        bot.send_sticker(chat_id, sticker)
+        await bot.send_sticker(chat_id, sticker)
     elif baguette_match:
         baguette_output = baguette_response(oh_match, sabbath_match, oh, sabbath)
         if baguette_output == '':
             return
-        bot.send_video_note(chat_id, open(baguette_output, 'rb'))
+        await bot.send_video_note(chat_id, open(baguette_output, 'rb'))
         if baguette_output != './baguette.mp4':
             os.remove(baguette_output)
     elif oh_match:
         text = oh_response(sabbath_match, oh, sabbath)
-        bot.send_message(chat_id, text)
+        await bot.send_message(chat_id, text)
     elif sabbath_match:
-        bot.send_message(chat_id, sabbath)
-    elif update.effective_chat.type == CHAT_PRIVATE or \
+        await bot.send_message(chat_id, sabbath)
+    elif update.effective_chat.type == ChatType.PRIVATE or \
             (
-                    (update.effective_chat.type == CHAT_SUPERGROUP or update.effective_chat.type == CHAT_GROUP) and
+                    (update.effective_chat.type == ChatType.SUPERGROUP or update.effective_chat.type == ChatType.GROUP) and
                     (
                             fool_match or bot_was_mentioned or
                             (from_user == bot.get_me() and (random.random() < 0.1 or '?' in text)) or
@@ -94,7 +90,7 @@ def huge_and_ugly_mega_text_handler_whaddaya_gonna_do_about_huh_its_my_bot(updat
         else:
             neural_text = neuro_response(last_messages)
         last_messages.append(neural_text)
-        message.reply_text(neural_text, quote=True)
+        await message.reply_text(neural_text, quote=True)
 
 
 def calculate_oh(match: Optional[Match[AnyStr]]) -> str:
@@ -105,9 +101,8 @@ if __name__ == '__main__':
     if not features.check_module('webp'):
         sys.exit('no webp support')
     start_handler = CommandHandler(str('start'), start)
-    wut_handler = MessageHandler(Filters.text & ~Filters.update.edited_message,
+    wut_handler = MessageHandler(filters.TEXT & ~filters.UpdateType.EDITED_MESSAGE,
                                  huge_and_ugly_mega_text_handler_whaddaya_gonna_do_about_huh_its_my_bot)
-    dispatcher.add_handler(start_handler)
-    dispatcher.add_handler(wut_handler)
-    updater.start_polling(drop_pending_updates=True)
-    updater.idle()
+    application.add_handler(start_handler)
+    application.add_handler(wut_handler)
+    application.run_polling(drop_pending_updates=True)

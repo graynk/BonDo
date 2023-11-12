@@ -17,7 +17,7 @@ big_font = ImageFont.truetype('times-new-roman.ttf', default_font_size)
 def add_text(image: Image, text: str, height: int) -> Image:
     draw = ImageDraw.Draw(image)
     font = big_font
-    size = draw.textsize(text, font)
+    size = draw.textbbox((0, 0), text, font=font)
     font_size = default_font_size
     if height < shabaka_head_height:
         middle = shabaka_top_middle
@@ -26,13 +26,13 @@ def add_text(image: Image, text: str, height: int) -> Image:
         middle = shabaka_bot_middle
         box_width = shabaka_bot_width
 
-    while size[0] > box_width and font_size > 1:
+    while size[2] > box_width and font_size > 1:
         font_size -= 5
         if font_size < 1:
             font_size = 1
         font = ImageFont.truetype('times-new-roman.ttf', font_size)
-        size = draw.textsize(text, font)
-    width = middle - size[0] / 2
+        size = draw.textbbox((0, 0), text, font)
+    width = middle - size[2] / 2
 
     draw.text((width, height), text, (255, 255, 255), font=font, align='center')
     return image
