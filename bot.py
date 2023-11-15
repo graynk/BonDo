@@ -82,7 +82,7 @@ async def huge_and_ugly_mega_text_handler_whaddaya_gonna_do_about_huh_its_my_bot
                     (update.effective_chat.type == ChatType.SUPERGROUP or update.effective_chat.type == ChatType.GROUP) and
                     (
                             fool_match or bot_was_mentioned or
-                            (from_user == bot.get_me() and (random.random() < 0.1 or '?' in text)) or
+                            (from_user == await bot.get_me() and (random.random() < 0.1 or '?' in text)) or
                             random.random() < 0.01)
             ):
         if 'допиши' in text.lower() and message.reply_to_message and message.reply_to_message.text:
