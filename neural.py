@@ -2,6 +2,7 @@ import torch
 from transformers import GPT2LMHeadModel, GPT2Tokenizer
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+print('starting on {}'.format(device))
 tok = GPT2Tokenizer.from_pretrained('models/')
 if tok.pad_token is None:
     tok.pad_token = tok.eos_token
