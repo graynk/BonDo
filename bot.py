@@ -15,11 +15,13 @@ from telegram.constants import ChatType
 from telegram.ext import Application, CallbackContext, CommandHandler, MessageHandler
 from telegram.ext import filters
 
+from ffmpeg import BAGUETTE
 from format_timedelta import calculate_shabbat
 from response import shabaka_response, baguette_response, oh_response, neuro_response, neuro_complete
 
 TOKEN = os.environ.get('BOT_TOKEN')
 LAST_MESSAGES = 'last_messages'
+LEBOWSKI = 'lebowski.jpg'
 application = Application.builder().token(TOKEN).build()
 tz = pytz.timezone('Asia/Jerusalem')
 
@@ -61,6 +63,8 @@ async def huge_and_ugly_mega_text_handler_whaddaya_gonna_do_about_huh_its_my_bot
         sabbath = calculate_shabbat(datetime.datetime.now(tz))
     baguette_match = baguette_pattern.search(text)
     has_shabaka = 'шабака' in text.lower()
+    has_lebowski = 'лебовски' in text.lower()
+    has_completion_request = 'допиши' in text.lower()
 
     if has_shabaka:
         sticker = shabaka_response(oh_match, sabbath_match, baguette_match, oh, sabbath)
@@ -70,22 +74,28 @@ async def huge_and_ugly_mega_text_handler_whaddaya_gonna_do_about_huh_its_my_bot
         if baguette_output == '':
             return
         await bot.send_video_note(chat_id, open(baguette_output, 'rb'))
-        if baguette_output != './baguette.mp4':
+        if baguette_output != BAGUETTE:
             os.remove(baguette_output)
     elif oh_match:
         text = oh_response(sabbath_match, oh, sabbath)
-        await bot.send_message(chat_id, text)
+        if has_lebowski:
+            await bot.send_photo(chat_id, LEBOWSKI, caption=text)
+        else:
+            await bot.send_message(chat_id, text)
     elif sabbath_match:
-        await bot.send_message(chat_id, sabbath)
+        if has_lebowski:
+            await bot.send_photo(chat_id, LEBOWSKI, caption=sabbath)
+        else:
+            await bot.send_message(chat_id, sabbath)
     elif update.effective_chat.type == ChatType.PRIVATE or \
             (
                     (update.effective_chat.type == ChatType.SUPERGROUP or update.effective_chat.type == ChatType.GROUP) and
                     (
-                            fool_match or bot_was_mentioned or
+                            fool_match or bot_was_mentioned or has_completion_request or
                             (from_user == await bot.get_me() and (random.random() < 0.1 or '?' in text)) or
                             random.random() < 0.01)
             ):
-        if 'допиши' in text.lower() and message.reply_to_message and message.reply_to_message.text:
+        if has_completion_request and message.reply_to_message and message.reply_to_message.text:
             neural_text = neuro_complete(message.reply_to_message.text)
         else:
             neural_text = neuro_response(last_messages)

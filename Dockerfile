@@ -20,6 +20,7 @@ COPY response.py .
 COPY neural.py .
 COPY shabaka.webp .
 COPY baguette.mp4 .
+COPY lebowski.jpg .
 COPY font.ttf .
 COPY ru_dict /usr/lib/x86_64-linux-gnu/espeak-data/
 

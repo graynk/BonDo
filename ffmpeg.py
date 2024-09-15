@@ -3,10 +3,11 @@ import subprocess
 import uuid
 from typing import List
 
+BAGUETTE = './baguette.mp4'
 
 def run_ffmpeg(oh_voice: str, sabbath_voice: str) -> str:
     if oh_voice is None and sabbath_voice is None:
-        return './baguette.mp4'
+        return BAGUETTE
     output = str(uuid.uuid4()) + '.mp4'
     try:
         pipe = subprocess.Popen(construct_ffmpeg_args(oh_voice, sabbath_voice, output))
@@ -22,7 +23,7 @@ def run_ffmpeg(oh_voice: str, sabbath_voice: str) -> str:
 def construct_ffmpeg_args(oh_voice: str, sabbath_voice: str, output: str) -> List[str]:
     filter_string = '[0:a]volume=1.0[a0]; '
     args = ['ffmpeg',
-            '-i', 'baguette.mp4',
+            '-i', BAGUETTE,
             '-filter_complex',
             '-map', '0:v',
             '-map', '[out]',

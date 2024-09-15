@@ -1,8 +1,7 @@
-Pillow==10.2.0
-python-telegram-bot==20.7
+Pillow==10.4.0
+python-telegram-bot==21.5
 astral==3.2
-pyttsx3==2.90
-pytz~=2023.4
-torch==2.2.0
-transformers==4.37.2
-numpy==1.26.3
+pyttsx3==2.97
+pytz~=2024.2
+torch==2.4.1
+transformers==4.44.2
